@@ -1,18 +1,14 @@
 package com.anez.annotation;
 
-/**
- * @author cxw
- * @description NotRepeatSubmit
- * @date 2020/11/9 9:20
- */
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 禁止重复提交
+ * @author cxw
+ * @description 禁止重复提交
+ * @date 2020/11/9 9:20
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

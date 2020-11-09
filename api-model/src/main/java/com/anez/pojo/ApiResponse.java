@@ -2,10 +2,9 @@ package com.anez.pojo;
 
 import cn.hutool.crypto.SecureUtil;
 import com.anez.enumerate.ApiCodeEnum;
+import com.anez.utils.ApiUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import com.anez.utils.ApiUtil;
-import org.springframework.util.Assert;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -13,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author cxw
- * @description ApiResponse
+ * @description 统一返回处理类
  * @date 2020/11/9 9:42
  */
 @Data

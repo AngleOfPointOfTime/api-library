@@ -15,7 +15,10 @@ import javax.annotation.Resource;
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
-    private static final String[] excludePathPatterns = {"/api/token/api_token"};
+    /**
+     * 过滤掉不需要进行拦截的url
+     */
+    private static final String[] EXCLUDE_PATH_PATTERNS = {"/api/token/api_token"};
 
     @Resource
     private TokenInterceptor tokenInterceptor;
@@ -23,6 +26,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         super.addInterceptors(registry);
-        registry.addInterceptor(tokenInterceptor).addPathPatterns("/api/**").excludePathPatterns(excludePathPatterns);
+        registry.addInterceptor(tokenInterceptor).addPathPatterns("/api/**").excludePathPatterns(EXCLUDE_PATH_PATTERNS);
     }
 }

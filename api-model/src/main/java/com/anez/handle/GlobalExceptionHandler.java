@@ -13,12 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author cxw
- * @description GlobalExceptionHandler
+ * @description 捕获全局的异常信息
  * @date 2020/11/9 10:01
  */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     @ResponseBody
     @ExceptionHandler(NullPointerException.class)
     public ApiResponse<?> globalException(HttpServletResponse response, NullPointerException ex) {

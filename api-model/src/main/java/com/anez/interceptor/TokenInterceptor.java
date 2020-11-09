@@ -3,7 +3,6 @@ package com.anez.interceptor;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.anez.annotation.NotRepeatSubmit;
-import com.anez.constant.FilterUrlWhenNoTokenConstant;
 import com.anez.enumerate.ApiCodeEnum;
 import com.anez.pojo.TokenInfo;
 import com.anez.utils.ApiUtil;
@@ -16,9 +15,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author cxw
@@ -32,10 +29,9 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     private RedisTemplate redisTemplate;
 
     /**
-     *
      * @param request
      * @param response
-     * @param handler 访问的目标方法
+     * @param handler  访问的目标方法
      * @return
      * @throws Exception
      */
@@ -56,29 +52,17 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         // long requestInterval = System.currentTimeMillis() - Long.parseLong(timestamp);
         // Assert.isTrue(requestInterval < expireTime, ApiCodeEnum.REQUEST_TIMEOUT.getMsg());
 
-        AtomicBoolean flag = new AtomicBoolean(true);
-        List<String> filterUrlList = FilterUrlWhenNoTokenConstant.getFilterUrl();
-        filterUrlList.forEach(filterUrl->{
-            if (filterUrl.contains(request.getRequestURI())) {
-                flag.set(false);
-            }
-        });
+        // 3. 校验Token是否存在
+        ValueOperations<String, TokenInfo> tokenRedis = redisTemplate.opsForValue();
+        TokenInfo tokenInfo = tokenRedis.get(token);
+        Assert.notNull(tokenInfo, ApiCodeEnum.SIGN_ERROR.getMsg());
 
-        // 3. 校验Token是否存在, 过滤掉需要不校验token的
-        if (flag.get()) {
-            ValueOperations<String, TokenInfo> tokenRedis = redisTemplate.opsForValue();
-            TokenInfo tokenInfo = tokenRedis.get(token);
-            Assert.notNull(tokenInfo, ApiCodeEnum.SIGN_ERROR.getMsg());
-
-            // 4. 校验签名(将所有的参数加进来，防止别人篡改参数) 所有参数看参数名升续排序拼接成url
-            // 请求参数 + token + timestamp + nonce
-            String signString = ApiUtil.concatSignString(request) + tokenInfo.getAppInfo().getKey() + token + timestamp + nonce;
-            String signature = SecureUtil.md5(signString);
-            boolean signFlag = signature.equals(sign);
-            Assert.isTrue(signFlag, ApiCodeEnum.SIGN_ERROR.getMsg());
-        } else {
-            // 如果没有token时怎么校验请求报文
-        }
+        // 4. 校验签名(将所有的参数加进来，防止别人篡改参数) 所有参数看参数名升续排序拼接成url
+        // 请求参数 + token + timestamp + nonce
+        String signString = ApiUtil.concatSignString(request) + tokenInfo.getAppInfo().getKey() + token + timestamp + nonce;
+        String signature = SecureUtil.md5(signString);
+        boolean signFlag = signature.equals(sign);
+        Assert.isTrue(signFlag, ApiCodeEnum.SIGN_ERROR.getMsg());
 
         // 5. 拒绝重复调用(第一次访问时存储，)过期时间和请求超时时间保持一致, 只有标注不允许重复提交注解的才会校验
         if (notRepeatSubmit != null) {
