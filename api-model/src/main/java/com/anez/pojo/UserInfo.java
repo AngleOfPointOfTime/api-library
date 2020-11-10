@@ -1,6 +1,8 @@
 package com.anez.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author cxw
@@ -8,6 +10,8 @@ import lombok.Data;
  * @date 2020/11/9 9:39
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserInfo {
     /**
      * 用户名
