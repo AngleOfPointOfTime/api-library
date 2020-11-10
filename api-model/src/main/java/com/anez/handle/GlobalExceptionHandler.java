@@ -1,5 +1,6 @@
 package com.anez.handle;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.anez.enumerate.ApiCodeEnum;
 import com.anez.exception.BusinessException;
@@ -38,6 +39,7 @@ public class GlobalExceptionHandler {
     ApiResponse<?> handleException(Exception e){
         String message = e.getMessage();
         String code = ApiCodeEnum.getCode(message);
+        log.error(ExceptionUtil.getMessage(e));
         if (StrUtil.isBlank(code)) {
             return ApiResponse.error(ApiCodeEnum.UNKNOWN_ERROR);
         }
@@ -54,6 +56,7 @@ public class GlobalExceptionHandler {
     ApiResponse<?> handleBusinessException(BusinessException e){
         String message = e.getMessage();
         String code = ApiCodeEnum.getCode(message);
+        log.error(ExceptionUtil.getMessage(e));
         if (StrUtil.isBlank(code)) {
             return ApiResponse.error(ApiCodeEnum.UNKNOWN_ERROR);
         }

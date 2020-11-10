@@ -6,6 +6,7 @@ import com.anez.annotation.NotRepeatSubmit;
 import com.anez.enumerate.ApiCodeEnum;
 import com.anez.pojo.TokenInfo;
 import com.anez.utils.ApiUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @description TokenInterceptor
  * @date 2020/11/9 9:17
  */
+@Slf4j
 @Component
 public class TokenInterceptor extends HandlerInterceptorAdapter {
 
@@ -42,7 +44,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         // 随机字符串
         String nonce = request.getHeader("nonce");
         String sign = request.getHeader("sign");
-        Assert.isTrue(StrUtil.isEmpty(timestamp) || StrUtil.isEmpty(sign), ApiCodeEnum.PARAMETER_ERROR.getMsg());
+        Assert.isTrue(StrUtil.isNotBlank(timestamp) && StrUtil.isNotBlank(sign), ApiCodeEnum.PARAMETER_ERROR.getMsg());
 
         // 获取超时时间
         NotRepeatSubmit notRepeatSubmit = ApiUtil.getNotRepeatSubmit(handler);
@@ -61,6 +63,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         // 请求参数 + token + timestamp + nonce
         String signString = ApiUtil.concatSignString(request) + tokenInfo.getAppInfo().getKey() + token + timestamp + nonce;
         String signature = SecureUtil.md5(signString);
+        log.info("local sign is：{}", signature);
         boolean signFlag = signature.equals(sign);
         Assert.isTrue(signFlag, ApiCodeEnum.SIGN_ERROR.getMsg());
 
