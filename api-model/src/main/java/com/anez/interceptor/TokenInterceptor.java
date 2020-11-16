@@ -4,9 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.anez.annotation.NotRepeatSubmit;
 import com.anez.enumerate.ApiCodeEnum;
+import com.anez.filter.ContentCachingRequestWrapper;
 import com.anez.pojo.TokenInfo;
 import com.anez.utils.ApiUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -39,6 +41,10 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 获取到复制出来的body，可以根据此body进行一些操作
+        ContentCachingRequestWrapper requestWrapper = (ContentCachingRequestWrapper) request;
+        String body = IOUtils.toString(requestWrapper.getBody(), request.getCharacterEncoding());
+
         String token = request.getHeader("token");
         String timestamp = request.getHeader("timestamp");
         // 随机字符串
